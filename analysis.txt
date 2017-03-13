@@ -12,7 +12,8 @@ Part 2:
   Q3: 
     We ran ./mm 1024 1024 1024 and had the following results: (1) 16.9923s
     (2) 61.102s (3) 60.9968s (4) 61.3216s (5) 61.7574
-    We are not sure why we recorded such a small value the first run through but based on this data the naive version either runs at _____Gflops/s for the 16.99s run through or _____Gflops/s for the average of the others (~61.29s)
+    We are not sure why we recorded such a small value the first run through but based on this data the naive version either runs at 0.134 Gflops/s for the 16.99s run through or 0.0352Gflops/s for the average of the others (~61.29s)
+    We used the equation: numOps = 2*n*m*k and gflops = 1.0e-9 * numOps/Execution Time
   Q4:
   Q5:
   Q6:
