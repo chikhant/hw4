@@ -46,9 +46,10 @@ void helper(dtype *C, dtype *A, dtype *B, int M, int K, int i, int j, int k, int
 	}
 }
 
-void mm_cb (dtype *C_cb, dtype *A, dtype *B, int N, int K, int M, int blockSize)
+double mm_cb (dtype *C_cb, dtype *A, dtype *B, int N, int K, int M, int blockSize)
 {
-	int sum, ii, jj;
+	double gflops = 0.0;
+	double temp = 0.0;
 
 	for (int i = 0; i < N/blockSize; i++)
 	{
@@ -60,9 +61,8 @@ void mm_cb (dtype *C_cb, dtype *A, dtype *B, int N, int K, int M, int blockSize)
 			}
 		}
 	}
-
 	/* mm_serial(C_cb, A, B, N, K, M); */
-
+	return gflops;
   /* =======================================================+ */
   /* Implement your own cache-blocked matrix-matrix multiply  */
   /* =======================================================+ */
@@ -79,6 +79,8 @@ int main(int argc, char** argv)
 {
   int i, j, k;
   int N, K, M, subBlock;
+  double gflops = 0.0;
+  double temp = 0.0;
 
  /* if(argc == 4) {
     N = atoi (argv[1]);		
@@ -131,7 +133,7 @@ int main(int argc, char** argv)
   printf("Naive matrix multiply\n");
   stopwatch_start (timer);
   /* do C += A * B */
-  mm_serial (C, A, B, N, K, M);
+  //mm_serial (C, A, B, N, K, M);
   t = stopwatch_stop (timer);
   printf("Done\n");
   printf("time for naive implementation: %Lg seconds\n\n", t);
@@ -140,11 +142,13 @@ int main(int argc, char** argv)
   printf("Cache-blocked matrix multiply\n");
   stopwatch_start (timer);
   /* do C += A * B */
-  mm_cb (C_cb, A, B, N, K, M, subBlock);
+  temp = mm_cb (C_cb, A, B, N, K, M, subBlock);
   t = stopwatch_stop (timer);
   printf("Done\n");
   printf("time for cache-blocked implementation: %Lg seconds\n", t);
-
+  gflops = temp/t;
+  printf("temp = %f - Gflops = %f\n", temp, gflops);
+  
   /* verify answer */
   verify (C_cb, C, N, M);
 
