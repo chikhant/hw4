@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include <assert.h>
-
 #include "timer.c"
 
 #define N_ 4096
@@ -33,14 +32,43 @@ void mm_serial (dtype *C, dtype *A, dtype *B, int N, int K, int M)
   }
 }
 
-void mm_cb (dtype *C, dtype *A, dtype *B, int N, int K, int M)
+void helper(dtype *C, dtype *A, dtype *B, int M, int K, int i, int j, int k, int blockSize)
 {
+	for (int x = i * blockSize; x < (i + 1) * blockSize; x++)
+	{
+		for (int y = j * blockSize; y < (j + 1) * blockSize; y++)
+		{
+			for (int z = k * blockSize; z < (k + 1) * blockSize; z++)
+			{
+				C[x * M + y] += A[x * K + z] * B[z * M + y];
+			}
+		}
+	}
+}
+
+void mm_cb (dtype *C_cb, dtype *A, dtype *B, int N, int K, int M, int blockSize)
+{
+	int sum, ii, jj;
+
+	for (int i = 0; i < N/blockSize; i++)
+	{
+		for (int j = 0; j < M/blockSize; j++)
+		{
+			for (int k = 0; k < K/blockSize; k++)
+			{
+				helper(C_cb, A, B, M, K, i, j, k, blockSize);
+			}
+		}
+	}
+
+	/* mm_serial(C_cb, A, B, N, K, M); */
+
   /* =======================================================+ */
   /* Implement your own cache-blocked matrix-matrix multiply  */
   /* =======================================================+ */
 }
 
-void mm_sv (dtype *C, dtype *A, dtype *B, int N, int K, int M)
+void mm_sv (dtype *C_sv, dtype *A, dtype *B, int N, int K, int M)
 {
   /* =======================================================+ */
   /* Implement your own SIMD-vectorized matrix-matrix multiply  */
@@ -50,17 +78,25 @@ void mm_sv (dtype *C, dtype *A, dtype *B, int N, int K, int M)
 int main(int argc, char** argv)
 {
   int i, j, k;
-  int N, K, M;
+  int N, K, M, subBlock;
 
-  if(argc == 4) {
+ /* if(argc == 4) {
     N = atoi (argv[1]);		
     K = atoi (argv[2]);		
     M = atoi (argv[3]);		
     printf("N: %d K: %d M: %d\n", N, K, M);
-  } else {
+  }*/ 
+  if(argc == 5){
+	N = atoi (argv[1]);		
+    K = atoi (argv[2]);		
+    M = atoi (argv[3]);	
+	subBlock = atoi (argv[4]);	
+    printf("N: %d K: %d M: %d Sub Block size: %d\n", N, K, M, subBlock);
+  }else {
     N = N_;
     K = K_;
     M = M_;
+	// TODO: Probably should initialize subBlock size too
     printf("N: %d K: %d M: %d\n", N, K, M);	
   }
 
@@ -104,7 +140,7 @@ int main(int argc, char** argv)
   printf("Cache-blocked matrix multiply\n");
   stopwatch_start (timer);
   /* do C += A * B */
-  mm_cb (C_cb, A, B, N, K, M);
+  mm_cb (C_cb, A, B, N, K, M, subBlock);
   t = stopwatch_stop (timer);
   printf("Done\n");
   printf("time for cache-blocked implementation: %Lg seconds\n", t);
