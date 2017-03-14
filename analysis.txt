@@ -19,5 +19,24 @@ Part 2:
 		We are not sure why we recorded such a small value the first run through but based on this data the naive version either runs at 0.134 Gflops/s for the 16.99s run through or 0.0352Gflops/s for the average of the others (~61.29s)
 		We used the equation: numOps = 2*n*m*k and Gflops/s = 1.0e-9 * numOps/Execution Time
 	Q4:
-	Q5:
+     Completed cache-blocked version of matrix-matrix multiply. Subblock can be varied.
+	Q5: Vary block size and measure/report performance of code in terms of GFLOP/s. Operations = 2n/blocksize^3*blocksize^3
+     SubBlock Size = 2:
+       (1) 38.43s (2) 12.553s (3) 12.528s
+       ~0.30431 GFlops 
+     SubBlock Size = 8:
+       (1) 11.0296s (2) 7.72225s (3) 11.0389s
+       ~0.648783 GFlops
+     SubBlock Size = 32:
+       (1) 11.626s (2) 11.6958s (3) 11.7105s
+       ~0.5517009 GFlops
+     SubBlock Size = 64:
+       (1) 11.7561s (2) 11.763s (3) 11.7803s
+       ~0.54752638 GFlops 
+     SubBlock Size = 128:
+       (1) 11.931s (2) 11.9272s (3) 11.9194s
+       ~0.5402081 GFlops
+     SubBlock Size = 512:
+       (1) 11.95s (2) 12.0287s (3) 11.9754s
+       ~0.53756 GFlops
 	Q6:
