@@ -20,24 +20,24 @@ Part 2:
 		We used the equation: numOps = 2*n*m*k and Gflops/s = 1.0e-9 * numOps/Execution Time
 	Q4:
      Completed cache-blocked version of matrix-matrix multiply. Subblock can be varied.
-	Q5: Vary block size and measure/report performance of code in terms of GFLOP/s. Operations = 2n/blocksize^3*blocksize^3
-     SubBlock Size = 2:
-       (1) 38.43s (2) 12.553s (3) 12.528s
-       ~0.30431 GFlops 
-     SubBlock Size = 8:
-       (1) 11.0296s (2) 7.72225s (3) 11.0389s
-       ~0.648783 GFlops
-     SubBlock Size = 32:
-       (1) 11.626s (2) 11.6958s (3) 11.7105s
-       ~0.5517009 GFlops
-     SubBlock Size = 64:
-       (1) 11.7561s (2) 11.763s (3) 11.7803s
-       ~0.54752638 GFlops 
-     SubBlock Size = 128:
-       (1) 11.931s (2) 11.9272s (3) 11.9194s
-       ~0.5402081 GFlops
-     SubBlock Size = 512:
-       (1) 11.95s (2) 12.0287s (3) 11.9754s
-       ~0.53756 GFlops
+	Q5: Vary block size and measure/report performance of code in terms of GFLOP/s. Operations = (2(n/blocksize)^3)*blocksize^3
+     SubBlock Size = 2, Operations = 2147483648:
+       (1) 12.2527s (2) 8.582s (3) 8.35807s
+       ~0.22068 GFlops 
+     SubBlock Size = 8, Operations = 2147483648:
+       (1) 3.08026s (2) 1.81849s (3) 3.09276s
+       ~0.80616 GFlops
+     SubBlock Size = 32, Operations = 2147483648:
+       (1) 2.2726s (2) 2.26687s (3) 2.21704s
+       ~0.9535175 GFlops
+     SubBlock Size = 64, Operations = 2147483648:
+       (1) 2.06591s (2) 2.03813s (3) 2.07394s
+       ~1.042815 GFlops 
+     SubBlock Size = 128, Operations = 2098176:
+       (1) 2.09947s (2) 2.08897s (3) 2.081s
+       ~1.02759 GFlops
+     SubBlock Size = 512, Operations = 134217744:
+       (1) 1.93873s (2) 2.23177s (3) 1.98782s
+       ~1.04614 GFlops
    Based on our data and some research, we estimate L1 and L2 to be 32KB and 6MB respectively. This works with out data because the naive version is much larger than 6MB in operations so it would always go to slow memory. 
 	Q6:
