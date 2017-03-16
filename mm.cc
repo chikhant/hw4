@@ -32,16 +32,19 @@ void mm_serial (dtype *C, dtype *A, dtype *B, int N, int K, int M)
   }
 }
 
-void helper(dtype *C, dtype *A, dtype *B, int M, int K, int i, int j, int k, int blockSize)
+void cb_helper(dtype *C, dtype *A, dtype *B, int M, int K, int i, int j, int k, int blockSize)
 {
+	dtype sum;
 	for (int x = i * blockSize; x < (i + 1) * blockSize; x++)
 	{
 		for (int y = j * blockSize; y < (j + 1) * blockSize; y++)
 		{
+			sum = 0;
 			for (int z = k * blockSize; z < (k + 1) * blockSize; z++)
 			{
-				C[x * M + y] += A[x * K + z] * B[z * M + y];
+				sum += A[x * K + z] * B[z * M + y];
 			}
+			C[x * M + y] += sum;
 		}
 	}
 }
@@ -57,7 +60,7 @@ double mm_cb (dtype *C_cb, dtype *A, dtype *B, int N, int K, int M, int blockSiz
 		{
 			for (int k = 0; k < K/blockSize; k++)
 			{
-				helper(C_cb, A, B, M, K, i, j, k, blockSize);
+				cb_helper(C_cb, A, B, M, K, i, j, k, blockSize);
 			}
 		}
 	}
@@ -133,7 +136,7 @@ int main(int argc, char** argv)
   printf("Naive matrix multiply\n");
   stopwatch_start (timer);
   /* do C += A * B */
-  //mm_serial (C, A, B, N, K, M);
+  mm_serial (C, A, B, N, K, M);
   t = stopwatch_stop (timer);
   printf("Done\n");
   printf("time for naive implementation: %Lg seconds\n\n", t);
