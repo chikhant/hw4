@@ -39,4 +39,5 @@ Part 2:
      SubBlock Size = 512:
        (1) 11.95s (2) 12.0287s (3) 11.9754s
        ~0.53756 GFlops
+   Based on our data and some research, we estimate L1 and L2 to be 32KB and 6MB respectively. This works with out data because the naive version is much larger than 6MB in operations so it would always go to slow memory. 
 	Q6:
