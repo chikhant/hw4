@@ -1,7 +1,3 @@
-EECS 117 - Homework 4
-Anissa Tran 47098893
-Josue Galeas 72625644
-
 _____________________________________________________
 Part 1:
 	Q1: How many levels of cache do there appear to be?
