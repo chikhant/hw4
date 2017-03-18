@@ -3,6 +3,7 @@
 #include <time.h>
 #include <assert.h>
 #include "timer.c"
+#include <x86intrin.h>
 
 #define N_ 4096
 #define K_ 4096
@@ -64,15 +65,68 @@ double mm_cb (dtype *C_cb, dtype *A, dtype *B, int N, int K, int M, int blockSiz
 			}
 		}
 	}
-	/* mm_serial(C_cb, A, B, N, K, M); */
 	return gflops;
   /* =======================================================+ */
   /* Implement your own cache-blocked matrix-matrix multiply  */
   /* =======================================================+ */
 }
 
-void mm_sv (dtype *C_sv, dtype *A, dtype *B, int N, int K, int M)
+void sv_helper(dtype *C, dtype *A, dtype *B, int M, int K, int i, int j, int k, int blockSize)
 {
+	int fit = 128 / (sizeof(dtype) * 8);
+	dtype sum;
+	__m128 sumSIMD;
+
+	if (fit < blockSize)
+	{
+		for (int x = i * blockSize; x < (i * blockSize + fit); x++)
+		{
+			for (int y = j * blockSize; y < (j * blockSize + fit); y++)
+			{
+				sum = 0;
+				for (int z = k * blockSize; z < (k * blockSize + fit); z++)
+				{
+					sum += A[x * K + z] * B[z * M + y];
+				}
+				C[x * M + y] += sum;
+			}
+		}
+	}
+	else
+	{
+		for (int x = i * blockSize; x < ((i + 1) * blockSize)/fit; x += fit)
+		{
+			for (int y = j * blockSize; y < ((j + 1) * blockSize)/fit; y += fit)
+			{
+				sumSIMD = _mm_set_ps1(0);
+				for (int z = k * blockSize; z < ((k + 1) * blockSize)/fit; z += fit)
+				{
+					/* sum += A[x * K + z] * B[z * M + y]; */
+					// TODO: Do magic here
+				}
+				C[x * M + y] += sum;
+			}
+		}
+	}
+
+}
+
+double mm_sv (dtype *C_sv, dtype *A, dtype *B, int N, int K, int M, int blockSize)
+{
+	double gflops = 0.0;
+	double temp = 0.0;
+
+	for (int i = 0; i < N/blockSize; i++)
+	{
+		for (int j = 0; j < M/blockSize; j++)
+		{
+			for (int k = 0; k < K/blockSize; k++)
+			{
+				sv_helper(C_sv, A, B, M, K, i, j, k, blockSize);
+			}
+		}
+	}
+	return gflops;
   /* =======================================================+ */
   /* Implement your own SIMD-vectorized matrix-matrix multiply  */
   /* =======================================================+ */
@@ -158,7 +212,7 @@ int main(int argc, char** argv)
   printf("SIMD-vectorized Cache-blocked matrix multiply\n");
   stopwatch_start (timer);
   /* do C += A * B */
-  mm_sv (C_sv, A, B, N, K, M);
+  temp = mm_sv (C_sv, A, B, N, K, M, subBlock);
   t = stopwatch_stop (timer);
   printf("Done\n");
   printf("time for SIMD-vectorized cache-blocked implementation: %Lg seconds\n", t);
